@@ -17,9 +17,10 @@ You need Python installed on your system. For download/install instructions, ref
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[https://wiki.python.org/moin/BeginnersGuide/Download](https://wiki.python.org/moin/BeginnersGuide/Download)
 
 You also need PostgreSQL installed on your system. For download/install instructions, refer to this guide:
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[https://wiki.postgresql.org/wiki/Detailed_installation_guides](https://wiki.postgresql.org/wiki/Detailed_installation_guides)
 
-Use the logic in **tournament.sql** to set up the application's database. 
+To set up the application's database, use the logic in **tournament.sql**
 
 ##### In Terminal:
 In a unix/osx shell or windows command prompt, execute the following commands:
