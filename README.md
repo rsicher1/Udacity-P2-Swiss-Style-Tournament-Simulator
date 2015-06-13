@@ -1,6 +1,6 @@
 ### **Swiss-Style Tournament Simulator**
 
-Simulates swiss-style tournaments using a PostgreSQL database to keep track of players and matches.
+Simulates swiss-style tournaments using a PostgreSQL database to keep track of players and matches
 
 #### Features
 * Supports multiple tournaments
