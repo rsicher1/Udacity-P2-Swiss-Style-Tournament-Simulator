@@ -20,7 +20,7 @@ class DatabaseOperations:
     self.db.commit()  
 
   def deleteSpecificPlayers(self, playerIds):
-    self.connection.execute("delete from player where player_id in %s", (playerIds,))
+    self.connection.execute("delete from player where id in %s", (playerIds,))
     self.db.commit()  
 
   def deleteTournament(self, tournamentId):

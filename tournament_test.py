@@ -17,6 +17,7 @@ def testDeleteTournamentFromDb():
   if tournamentInfo:
     raise ValueError("After deleting the tournament, information about the tournament can still be retrieved from the database")  
   print "1. After registering a tournament, it can be deleted from the database"
+  dbo.closeDbConnection()
 
 def testTournamentTotalPlayerCount():
   dbo = databaseoperations.DatabaseOperations()
@@ -28,6 +29,7 @@ def testTournamentTotalPlayerCount():
     raise ValueError("After registering a tournament, totalPlayerCount should be 0")
   print "2. After registering a tournament, totalPlayerCount is 0"
   t.deleteTournament()
+  dbo.closeDbConnection()
 
 def testTournamentRegisterPlayer():
   dbo = databaseoperations.DatabaseOperations()
@@ -38,19 +40,20 @@ def testTournamentRegisterPlayer():
     raise ValueError("After registering a tournament and a player, totalPlayerCount should be 1")
   print "3. After registering a tournament and a player, totalPlayerCount is 1"
   t.deleteTournament()
-  dbo.deletePlayers()
+  dbo.deleteSpecificPlayers((playerId,))
+  dbo.closeDbConnection()
 
 def testTournamentRegisterAndDeletePlayers():
   dbo = databaseoperations.DatabaseOperations()
   t = tournament.Tournament("The Greatest And Best Tournament In The World... Tribute", dbo)
-  playerId = dbo.registerPlayer("Markov Chaney")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("John Malik")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Mao Tsu-hsi")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Atlanta Hope")
-  t.registerPlayer(playerId)
+  player1Id = dbo.registerPlayer("Markov Chaney")
+  t.registerPlayer(player1Id)
+  player2Id = dbo.registerPlayer("John Malik")
+  t.registerPlayer(player2Id)
+  player3Id = dbo.registerPlayer("Mao Tsu-hsi")
+  t.registerPlayer(player3Id)
+  player4Id = dbo.registerPlayer("Atlanta Hope")
+  t.registerPlayer(player4Id)
   t.calculateTotalPlayerCount()
   if t.totalPlayerCount != 4:
     raise ValueError("After registering a tournament and four players, totalPlayerCount should be 4")
@@ -59,15 +62,16 @@ def testTournamentRegisterAndDeletePlayers():
       raise ValueError("After deleting all tournament players, totalPlayerCount should be 0")
   print "4. Tournament players can be registered and deleted"
   t.deleteTournament()
-  dbo.deletePlayers()
+  dbo.deleteSpecificPlayers((player1Id, player2Id, player3Id, player4Id))
+  dbo.closeDbConnection()
 
 def testTournamentStandingsBeforeFirstRound():
   dbo = databaseoperations.DatabaseOperations()
   t = tournament.Tournament("The Greatest And Best Tournament In The World... Tribute", dbo)
-  playerId = dbo.registerPlayer("Melpomene Murray")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Randy Schwartz")
-  t.registerPlayer(playerId)
+  player1Id = dbo.registerPlayer("Melpomene Murray")
+  t.registerPlayer(player1Id)
+  player2Id = dbo.registerPlayer("Randy Schwartz")
+  t.registerPlayer(player2Id)
   currentStandings = t.getCurrentStandingsFromDb()
   if len(currentStandings) < 2:
     raise ValueError("Players should appear in tournament standings even before they have played any matches")
@@ -83,19 +87,20 @@ def testTournamentStandingsBeforeFirstRound():
     raise ValueError("Registered tournament players' names should appear in standings even if they have not played any matches")
   print "5. Newly registered tournament players appear in standings even if they have not played any matches"
   t.deleteTournament()
-  dbo.deletePlayers()
+  dbo.deleteSpecificPlayers((player1Id, player2Id))
+  dbo.closeDbConnection()
 
 def testTournamentStandingsAfterOneRound():
   dbo = databaseoperations.DatabaseOperations()
   t = tournament.Tournament("The Greatest And Best Tournament In The World... Tribute", dbo)
-  playerId = dbo.registerPlayer("Bruno Walton")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Boots O'Neal")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Cathy Burton")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Diane Grant")
-  t.registerPlayer(playerId)
+  player1Id = dbo.registerPlayer("Bruno Walton")
+  t.registerPlayer(player1Id)
+  player2Id = dbo.registerPlayer("Boots O'Neal")
+  t.registerPlayer(player2Id)
+  player3Id = dbo.registerPlayer("Cathy Burton")
+  t.registerPlayer(player3Id)
+  player4Id = dbo.registerPlayer("Diane Grant")
+  t.registerPlayer(player4Id)
 
 
   t.players = t.getTournamentPlayerInfoFromDb()
@@ -142,19 +147,20 @@ def testTournamentStandingsAfterOneRound():
 
   print "6. After one tournament round, the tournament standings are correct"
   t.deleteTournament()
-  dbo.deletePlayers()
+  dbo.deleteSpecificPlayers((player1Id, player2Id, player3Id, player4Id))
+  dbo.closeDbConnection()
 
 def testBestPlayerMatchCombinationAfterOneRound():
   dbo = databaseoperations.DatabaseOperations()
   t = tournament.Tournament("The Greatest And Best Tournament In The World... Tribute", dbo)
-  playerId = dbo.registerPlayer("John Conner")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Patrick Bateman")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Don Draper")
-  t.registerPlayer(playerId)
-  playerId = dbo.registerPlayer("Louis CK")
-  t.registerPlayer(playerId)
+  player1Id = dbo.registerPlayer("John Conner")
+  t.registerPlayer(player1Id)
+  player2Id = dbo.registerPlayer("Patrick Bateman")
+  t.registerPlayer(player2Id)
+  player3Id = dbo.registerPlayer("Don Draper")
+  t.registerPlayer(player3Id)
+  player4Id = dbo.registerPlayer("Louis CK")
+  t.registerPlayer(player4Id)
 
   t.players = t.getTournamentPlayerInfoFromDb()
   t.totalPlayerCount = t.calculateTotalPlayerCount()
@@ -191,6 +197,7 @@ def testBestPlayerMatchCombinationAfterOneRound():
   [(rndTwoMatch1player1Id, rndTwoMatch1player2Id), (rndTwoMatch2player1Id, rndTwoMatch2player2Id)] = rndTwoPlayerMatchCombination[:2]
 
   defaultRndTwoMatches = [set((rndOneRank1PlayerId, rndOneRank2PlayerId)), set((rndOneRank3PlayerId, rndOneRank4PlayerId))]
+  
   if any(set(rndTwoTournamentPreviousRoundsPlayedMatch) in defaultRndTwoMatches for rndTwoTournamentPreviousRoundsPlayedMatch in rndTwoTournamentPreviousRoundsPlayedMatches):
     if rndTwoMatch1player1Id != rndOneRank1PlayerId or rndTwoMatch1player2Id != rndOneRank3PlayerId or rndTwoMatch2player1Id != rndOneRank2PlayerId or rndTwoMatch2player2Id != rndOneRank4PlayerId:
       raise ValueError("If the first place player played the second place player in round one, in round two, the first place player should play the third place player, and the second place player should play the fourth place player")
@@ -200,7 +207,8 @@ def testBestPlayerMatchCombinationAfterOneRound():
 
   print "7. The match combinations for round two are correct"
   t.deleteTournament()
-  dbo.deletePlayers()
+  dbo.deleteSpecificPlayers((player1Id, player2Id, player3Id, player4Id))
+  dbo.closeDbConnection()
 
 if __name__ == '__main__':
     testDeleteTournamentFromDb()
