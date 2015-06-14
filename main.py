@@ -14,7 +14,8 @@ if "__main__":
   playerIds.append(dbo.registerPlayer("Andy R"))
   playerIds.append(dbo.registerPlayer("Peter R"))
   playerIds.append(dbo.registerPlayer("Dave G"))
-#  playerIds.append(dbo.registerPlayer("Mary S"))
+# Uncomment following line to run the tournament simulation with an even number of players -
+# playerIds.append(dbo.registerPlayer("Mary S"))
 
   tournament = tournament.Tournament("The Greatest And Best Tournament In The World... Tribute", dbo)
 

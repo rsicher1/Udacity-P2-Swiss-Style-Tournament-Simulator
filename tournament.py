@@ -6,6 +6,7 @@ import random
 import round
 
 class Tournament:
+  ''' Includes tournament related data and operations '''
 
   def __init__(self, name, dbo, qualifiedPlaces = 3):
     self.name = name
@@ -27,12 +28,12 @@ class Tournament:
     return self.dbo.registerTournament(self.name)
 
   def registerPlayer(self, playerId):
-    self.registerPlayerInDb(playerId, seedNbr)
+    self.registerPlayerInDb(playerId)
     self.players = self.getTournamentPlayerInfoFromDb()
     self.totalPlayerCount = self.calculateTotalPlayerCount()
 
   def registerPlayerInDb(self, playerId):
-    self.dbo.registerTournamentPlayer(self.id, playerId, seedNbr)
+    self.dbo.registerTournamentPlayer(self.id, playerId)
 
   def simulate(self):
     self.started = True
@@ -62,12 +63,15 @@ class Tournament:
     else:
       return list(self.generatePossiblePlayerMatchCombinations(playerIds))
 
+  # Need to add extra dummy player id (None) to playerIds list in order for generatePossiblePlayerMatchCombinations
+  # to work correctly. Combinations with None playerId are filtered out after running.
   def determineInitialPossiblePlayerMatchCombinationsWithOddNumberOfPlayers(self, playerIds):
     playerIds.append(None)
     possiblePlayerMatchCombinationsOdd = list(self.generatePossiblePlayerMatchCombinations(playerIds))
 
     return [[match for match in possiblePlayerMatchCombinationOdd if not any(matchPlayer == None for matchPlayer in match)] for possiblePlayerMatchCombinationOdd in possiblePlayerMatchCombinationsOdd]
 
+  # recursive function which determines all possible combinations of pairings for a list of playerIds
   def generatePossiblePlayerMatchCombinations(self, playerIds):
     if len(playerIds) <= 1:
       yield playerIds
@@ -102,6 +106,8 @@ class Tournament:
     self.addRoundToTournament(rnd)
     rnd.outputRound(self.totalRoundCount, self.totalPlayerCountOdd)
 
+  # chooses a random bye player (if there are an odd number of players) and random combination of player  
+  # matches for the round
   def simulateFirstRound(self, rnd):
     if self.totalPlayerCountOdd:
       randomPlayer = self.chooseRandomTournamentPlayer()
@@ -126,6 +132,9 @@ class Tournament:
   def closeDbConnection(self):
     self.dbo.closeDbConnection()
 
+  # chooses the tournament top bye player with no bye round (if there are an odd number of players) and 
+  # the player match combination which minimize the difference between rankings and does not include any
+  # previously played matches
   def simulateSecondOrGreaterRound(self, rnd):
     if self.totalPlayerCountOdd:
       topPlayerWithNoByeRound = self.getTopPlayerWithNoByeRoundFromDb()

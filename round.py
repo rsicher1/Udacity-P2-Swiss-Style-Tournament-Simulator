@@ -7,6 +7,7 @@ import copy
 import match
 
 class Round:
+  ''' Includes tournament round related data and operations '''
 
   def __init__(self, dbo, tournamentId, roundNbr):
     self.dbo = dbo
@@ -31,12 +32,14 @@ class Round:
   def registerRoundByePlayerInDb(self):
     self.dbo.registerTournamentRoundByePlayer(self.tournamentId, self.nbr, self.roundByePlayerRank, self.roundByePlayerId)
 
+  # All possible match combinations, even with round's bye player (if there are an odd number of players)
   def setInitialRoundPossiblePlayerMatchCombinations(self, tournamentPossiblePlayerMatchCombinations):
     self.roundPossiblePlayerMatchCombinations = copy.deepcopy(tournamentPossiblePlayerMatchCombinations)
 
   def filterOutRoundPossiblePlayerMatchCombinationsWithRoundByePlayer(self):
     self.roundPossiblePlayerMatchCombinations = [roundPossiblePlayerMatchCombination for roundPossiblePlayerMatchCombination in self.roundPossiblePlayerMatchCombinations if not any(matchPlayer == self.roundByePlayerId for match in roundPossiblePlayerMatchCombination for matchPlayer in match)]
 
+  # Used in first round. Match combination is a simple, random choice.
   def chooseRandomRoundPossiblePlayerMatchCombination(self):
     return random.choice(self.roundPossiblePlayerMatchCombinations)
 
@@ -46,6 +49,8 @@ class Round:
   def setTournamentPreviousRoundStandings(self, tournamentPreviousRoundStandings):
     self.tournamentPreviousRoundStandings = tournamentPreviousRoundStandings
 
+  # Quality of a match combination is the sum of the difference in rankings of each match squared. The lower
+  # the total, the higher the quality.
   def determineRoundPossiblePlayerMatchCombinationQuality(self):
     for roundPossiblePlayerMatchCombination in self.roundPossiblePlayerMatchCombinations:
       roundPossiblePlayerMatchCombinationQuality = 0
@@ -68,6 +73,8 @@ class Round:
     bestRoundPossiblePlayerMatchCombination = min(self.roundPossiblePlayerMatchCombinations, key = lambda roundPossiblePlayerMatchCombination: roundPossiblePlayerMatchCombination[-1])
     return bestRoundPossiblePlayerMatchCombination
 
+  # Want to output the matches in rank order. The match with the top ranked player should output first, and 
+  # so on.
   def sortBestRoundPlayerMatchCombinationByTournamentCurrentPlayerRanks(self, bestRoundPossiblePlayerMatchCombination):
     bestRoundPossiblePlayerMatchCombination = copy.deepcopy(bestRoundPossiblePlayerMatchCombination)
     bestRoundPossiblePlayerMatchCombinationSorted = []

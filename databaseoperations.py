@@ -3,14 +3,17 @@
 import psycopg2
 
 class DatabaseOperations:
-  ''' Includes tournament-related postgres database operations '''
+  ''' Includes tournament related PostgreSQL database operations '''
 
   def __init__(self):
     self.connectToDb()
 
   def connectToDb(self):
-    self.db = psycopg2.connect("dbname=tournament")
-    self.connection = self.db.cursor()
+    try:
+      self.db = psycopg2.connect("dbname=tournament")
+      self.connection = self.db.cursor()
+    except psycopg2.Error as e:
+       print e
 
   def deletePlayers(self):
     self.connection.execute("delete from player")
@@ -70,13 +73,14 @@ class DatabaseOperations:
     self.db.commit()
     return self.connection.fetchone()[0]
 
-  def registerTournamentPlayer(self, tournamentId, playerId, seedNbr):
+  def registerTournamentPlayer(self, tournamentId, playerId):
     self.connection.execute("insert into tournament_register (tournament_id, player_id) values (%s, %s)", (tournamentId, playerId))
     self.db.commit()
 
   def registerTournamentHistoricalStandings(self, tournamentId, roundNbr):
     self.connection.execute('''
-      insert into historical_standing
+      insert into historical_standing(tournament_id, round_nbr, player_rank, actual_player_rank, player_id,
+        wins, losses, ties, points, opponent_points)
       select
         tournament_id,
         %s as round_nbr,
@@ -217,4 +221,7 @@ class DatabaseOperations:
 
   def closeDbConnection(self):
     if not self.connection is None and not self.connection.closed:
-      self.connection.close()
+      try:
+        self.connection.close()
+      except psycopg2.Error as e:
+        print e
